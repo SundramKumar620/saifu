@@ -1,0 +1,50 @@
+.import-wallet-modal {
+  width: 100%;
+}
+
+.mnemonic-input {
+  width: 100%;
+  padding: 14px 16px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  color: #ffffff;
+  font-size: 16px;
+  font-family: inherit;
+  resize: vertical;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  box-sizing: border-box;
+  will-change: border-color, background, box-shadow;
+}
+
+.mnemonic-input:focus {
+  outline: none;
+  border-color: #667eea;
+  background: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  transform: scale(1.01);
+}
+
+.mnemonic-input::placeholder {
+  color: rgba(255, 255, 255, 0.4);
+  transition: color 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.mnemonic-input:focus::placeholder {
+  color: rgba(255, 255, 255, 0.2);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .mnemonic-input {
+    padding: 12px 14px;
+    font-size: 15px;
+  }
+}
+
+@media (max-width: 480px) {
+  .mnemonic-input {
+    padding: 11px 12px;
+    font-size: 14px;
+  }
+}

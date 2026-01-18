@@ -1,0 +1,551 @@
+.wallet-interface {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  position: relative;
+  overflow: hidden;
+  padding: 50px;
+}
+
+.wallet-card {
+  padding: 40px 40px;
+  max-width: 520px;
+  width: 90%;
+  border-radius: 50px;
+  position: relative;
+  z-index: 1;
+  animation: cardFadeIn 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform, opacity;
+  background: rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(30px);
+  -webkit-backdrop-filter: blur(30px);
+  box-shadow: 0px 0px 70px rgba(0, 0, 0, 0.35);
+}
+
+.wallet-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50px;
+  padding: 1px;
+  background: linear-gradient(126.92deg, rgba(255, 255, 255, 0.4) 1.8%, rgba(255, 255, 255, 0) 42.58%, rgba(255, 255, 255, 0) 59.48%, rgba(255, 255, 255, 0.4) 93.12%);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  z-index: -1;
+  pointer-events: none;
+}
+
+@keyframes cardFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.wallet-header {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.wallet-header .logo-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 8px;
+}
+
+.wallet-title {
+  font-size: 32px;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0 0 0px 0;
+}
+
+.wallet-subtitle {
+  font-size: 16px;
+  text-align: center;
+  margin: 0 0 25px 0;
+  font-weight: 300;
+  color: rgba(255, 255, 255, 0.3);
+}
+
+.section-title {
+  font-size: 18px;
+  font-weight: 500;
+  color: #ffffff;
+  margin: 0 0 12px 0;
+}
+
+.main-account-section {
+  margin-bottom: 32px;
+}
+
+.address-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.address-input {
+  width: 100%;
+  padding: 14px 16px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  color: #ffffff;
+  font-size: 14px;
+  font-family: monospace;
+  box-sizing: border-box;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: border-color, background;
+}
+
+.address-input:focus {
+  outline: none;
+  border-color: rgba(102, 126, 234, 0.5);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.address-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.action-btn {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: background, border-color, transform;
+}
+
+.action-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.2);
+  transform: scale(1.02);
+}
+
+.action-btn:active {
+  transform: scale(0.98);
+  transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.manage-account-section {
+  margin-bottom: 32px;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.section-header h2 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+}
+
+.add-account-btn {
+  width: 40px;
+  height: 40px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 25%;
+  color: #ffffff;
+  font-size: 24px;
+  font-weight: 300;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform, background;
+  opacity: 1;
+}
+
+.add-account-btn:hover {
+  opacity: 0.8;
+  transform: scale(0.95);
+
+}
+
+.add-account-btn:active {
+  transform: scale(0.8);
+  transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.accounts-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.account-item {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: background, border-color, transform;
+}
+
+.account-item.selected-account {
+  border: 1px solid #667eea;
+  background: rgba(102, 126, 234, 0.2);
+}
+
+.account-item:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.2);
+  transform: translateX(4px);
+}
+
+.main-account-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.edit-name-btn {
+  background: rgba(102, 126, 234, 0.1);
+  border: 1px solid rgba(102, 126, 234, 0.3);
+  color: #667eea;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.edit-name-btn:hover {
+  background: rgba(102, 126, 234, 0.2);
+  border-color: rgba(102, 126, 234, 0.5);
+  transform: scale(1.05);
+}
+
+.account-name-display {
+  font-size: 20px;
+  font-weight: 600;
+  color: #ffffff;
+  margin-bottom: 16px;
+  padding: 12px 16px;
+  background: rgba(102, 126, 234, 0.1);
+  border: 1px solid rgba(102, 126, 234, 0.2);
+  border-radius: 10px;
+}
+
+.account-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.edit-account-btn {
+  background: rgba(227, 227, 228, 0.1);
+  border: 1px solid rgba(187, 186, 186, 0.3);
+  color: #ffffff6c;
+  width: 32px;
+  height: 32px;
+  border-radius: 25%;
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  flex-shrink: 0;
+  will-change: transform, background, opacity;
+}
+
+.edit-account-btn:hover {
+  opacity: 0.6;
+  transform: scale(0.95);
+}
+
+.account-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+
+.account-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.account-address {
+  font-size: 12px;
+  font-family: monospace;
+  color: rgba(255, 255, 255, 0.7);
+  word-break: break-all;
+}
+
+.account-path {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.5);
+  font-family: monospace;
+}
+
+.delete-account-btn {
+  background: rgba(255, 107, 107, 0.1);
+  border: 1px solid rgba(255, 107, 107, 0.2);
+  color: #ff6b6b;
+  width: 32px;
+  height: 32px;
+  border-radius: 25%;
+  font-size: 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  flex-shrink: 0;
+  will-change: transform, background, opacity;
+}
+
+.delete-account-btn:hover {
+  transform: scale(0.95);
+  opacity: 0.8;
+}
+
+.delete-account-btn:active {
+  transform: scale(0.9) rotate(90deg);
+  transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.no-accounts {
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 14px;
+  text-align: center;
+  padding: 20px;
+}
+
+.wallet-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.btn-lock {
+  flex: 1;
+  color: white;
+  border: none;
+  padding: 14px 24px;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  background: radial-gradient(54.52% 118% at 50% 83%, #FFFFFF 0%, rgba(255, 255, 255, 0) 100%), #3D44F7;
+  background-blend-mode: overlay, normal;
+  box-shadow: inset 0px 1px 3px #FFFFFF, 0 4px 15px rgba(102, 126, 234, 0.3);
+  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  will-change: transform, box-shadow, opacity;
+  opacity: 1;
+}
+
+.btn-lock:hover {
+  transform: translateY(-2px);
+  box-shadow: inset 0px 1px 8px rgb(0, 0, 0), 0 6px 20px rgba(14, 17, 33, 0.46);
+  opacity: 0.8;
+  color: #ffffff99;
+}
+
+.btn-lock:active {
+  transform: translateY(0) scale(0.98);
+  box-shadow: inset 0px 1px 8px rgba(0, 0, 0, 0.25), 0 2px 8px rgba(102, 126, 234, 0.3);
+  opacity: 0.9;
+  transition: all 0.1s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.btn-backup {
+  flex: 1;
+  padding: 14px 24px;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: background, border-color, transform;
+  background: rgba(255, 255, 255, 0.1);
+  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  will-change: transform, background, opacity;
+  box-shadow: inset 0px -0.5px 1px rgba(255, 255, 255, 0.78), inset 0px 1.5px 1px rgba(255, 255, 255, 0.8);
+  opacity: 1;
+  border: none;
+}
+
+.btn-backup:hover {
+  transform: scale(0.98);
+  opacity: 0.6;
+}
+
+.btn-backup:active {
+  transform: scale(0.94);
+  opacity: 0.9;
+  transition: all 0.1s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .wallet-interface {
+    padding: 30px 20px;
+  }
+
+  .wallet-card {
+    padding: 35px 30px;
+    max-width: 100%;
+    width: 95%;
+  }
+}
+
+@media (max-width: 768px) {
+  .wallet-interface {
+    padding: 20px 16px;
+  }
+
+  .wallet-card {
+    padding: 30px 24px;
+    border-radius: 30px;
+    width: 100%;
+  }
+
+  .wallet-card::before {
+    border-radius: 30px;
+  }
+
+  .wallet-title {
+    font-size: 28px;
+  }
+
+  .wallet-subtitle {
+    font-size: 14px;
+    margin-bottom: 20px;
+  }
+
+  .section-title {
+    font-size: 16px;
+  }
+
+  .address-actions {
+    flex-wrap: wrap;
+  }
+
+  .action-btn {
+    min-width: calc(50% - 4px);
+    font-size: 13px;
+    padding: 10px 14px;
+  }
+
+  .account-item {
+    padding: 14px;
+    flex-wrap: wrap;
+  }
+
+  .account-info {
+    width: 100%;
+    margin-bottom: 8px;
+  }
+
+  .account-actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+
+  .wallet-actions {
+    flex-direction: column;
+  }
+
+  .btn-lock,
+  .btn-backup {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .wallet-interface {
+    padding: 16px 12px;
+  }
+
+  .wallet-card {
+    padding: 24px 20px;
+    border-radius: 24px;
+  }
+
+  .wallet-card::before {
+    border-radius: 24px;
+  }
+
+  .wallet-title {
+    font-size: 24px;
+  }
+
+  .wallet-subtitle {
+    font-size: 13px;
+  }
+
+  .section-title {
+    font-size: 15px;
+  }
+
+  .address-input {
+    padding: 12px 14px;
+    font-size: 13px;
+  }
+
+  .action-btn {
+    min-width: 100%;
+    font-size: 12px;
+    padding: 9px 12px;
+  }
+
+  .account-item {
+    padding: 12px;
+  }
+
+  .account-label {
+    font-size: 13px;
+  }
+
+  .account-address {
+    font-size: 11px;
+  }
+
+  .account-path {
+    font-size: 10px;
+  }
+
+  .btn-lock,
+  .btn-backup {
+    padding: 12px 20px;
+    font-size: 15px;
+  }
+}

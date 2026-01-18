@@ -1,0 +1,133 @@
+.seed-phrase-modal {
+  width: 100%;
+}
+
+.seed-warning {
+  background: rgba(255, 193, 7, 0.1);
+  border: 1px solid rgba(255, 193, 7, 0.3);
+  border-radius: 10px;
+  padding: 16px;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 14px;
+  margin-bottom: 24px;
+  text-align: center;
+}
+
+.seed-phrase-container {
+  margin: 24px 0;
+}
+
+.seed-phrase-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.seed-word {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: background, border-color, transform;
+}
+
+.seed-word:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.2);
+  transform: scale(1.02);
+}
+
+.seed-word-number {
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 12px;
+  font-weight: 600;
+  min-width: 20px;
+}
+
+.seed-word-text {
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 500;
+  flex: 1;
+}
+
+.btn-copy {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 12px 24px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: background, border-color, transform, color;
+}
+
+.btn-copy:hover {
+  background: rgba(255, 255, 255, 0.1);
+  transform: scale(0.98);
+}
+
+.btn-copy:active {
+  transform: scale(0.98);
+  transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.btn-copy.copied {
+  background: rgba(76, 175, 80, 0.2);
+  border-color: rgba(76, 175, 80, 0.5);
+  color: #4caf50;
+  transform: scale(1);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .seed-phrase-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+
+  .seed-word {
+    padding: 10px;
+  }
+
+  .seed-word-number {
+    font-size: 11px;
+    min-width: 18px;
+  }
+
+  .seed-word-text {
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 480px) {
+  .seed-phrase-grid {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .seed-warning {
+    padding: 12px;
+    font-size: 13px;
+  }
+
+  .seed-word {
+    padding: 10px 12px;
+  }
+
+  .seed-word-number {
+    font-size: 10px;
+  }
+
+  .seed-word-text {
+    font-size: 12px;
+  }
+}
