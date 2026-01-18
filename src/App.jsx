@@ -7,6 +7,7 @@ import { useSessionStore } from "./store/sessionStore";
 import { deriveAccountLocally } from "./crypto/deriveAccount";
 import { generateMnemonic, validateMnemonic } from "@scure/bip39";
 import { wordlist } from "@scure/bip39/wordlists/english.js";
+import HeroSection from "./pages/HeroSection";
 import LandingPage from "./pages/LandingPage";
 import WalletInterface from "./pages/WalletInterface";
 import PasswordModal from "./components/PasswordModal";
@@ -20,6 +21,7 @@ export default function App() {
   const { walletExists, setWallet, selectAccount } = useWalletStore();
   const { setMnemonic } = useSessionStore();
 
+  const [showHeroSection, setShowHeroSection] = useState(true);
   const [showCreatePasswordModal, setShowCreatePasswordModal] = useState(false);
   const [showImportModal, setShowImportModal] = useState(false);
   const [showLoadingModal, setShowLoadingModal] = useState(false);
@@ -33,6 +35,7 @@ export default function App() {
       const accounts = await loadFromVault("accounts");
       if (accounts && accounts.length > 0) {
         setWallet(accounts);
+        setShowHeroSection(false); // Skip hero section if wallet exists
         // Restore selected account index
         const savedIndex = await loadFromVault("selectedAccountIndex");
         if (savedIndex !== undefined && accounts.some(acc => acc.index === savedIndex)) {
@@ -161,9 +164,15 @@ export default function App() {
     setGeneratedSeedPhrase("");
   };
 
+  const handleGetStarted = () => {
+    setShowHeroSection(false);
+  };
+
   return (
     <div className="app">
-      {!walletExists ? (
+      {showHeroSection ? (
+        <HeroSection onGetStarted={handleGetStarted} />
+      ) : !walletExists ? (
         <LandingPage
           onCreateWallet={handleCreateWallet}
           onImportWallet={handleImportWallet}
