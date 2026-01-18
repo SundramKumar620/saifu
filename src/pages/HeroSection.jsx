@@ -77,8 +77,8 @@ export default function HeroSection({ onGetStarted }) {
             <div className="hero-content">
                 <div className="hero-main">
                     <h1 className="hero-title">
-                        <span className="hero-title-line">Secure <em>Solana</em> Wallet</span>
-                        <span className="hero-title-line">For <em>Everyone</em></span>
+                        <span className="hero-title-line">Secure Solana Wallet</span>
+                        <span className="hero-title-line">For Everyone</span>
                     </h1>
                     <p className="hero-subtitle">
                         The all-in-one Solana HD wallet for secure, decentralized transactions
