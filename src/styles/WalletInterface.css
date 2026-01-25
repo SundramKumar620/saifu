@@ -206,8 +206,13 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-  will-change: background, border-color, transform;
+  transition:
+    background-color 0.3s ease,
+    border-color 0.3s ease,
+    transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.25s ease;
+
+  will-change: transform;
 }
 
 .account-item.selected-account {
@@ -218,7 +223,8 @@
 .account-item:hover {
   background: rgba(255, 255, 255, 0.08);
   border-color: rgba(255, 255, 255, 0.2);
-  transform: translateX(4px);
+  opacity: 0.75;
+  transform: scale(0.98);
 }
 
 .main-account-header {
@@ -338,7 +344,7 @@
 }
 
 .delete-account-btn:active {
-  transform: scale(0.9) rotate(90deg);
+  transform: scale(0.9);
   transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
 }
 

@@ -36,13 +36,11 @@ export default function App() {
       if (accounts && accounts.length > 0) {
         setWallet(accounts);
         setShowHeroSection(false); // Skip hero section if wallet exists
-        // Restore selected account index
-        const savedIndex = await loadFromVault("selectedAccountIndex");
+        const savedIndex = await loadFromVault("selectedAccountIndex"); // Restore selected account index
         if (savedIndex !== undefined && accounts.some(acc => acc.index === savedIndex)) {
           selectAccount(savedIndex);
         } else {
-          // Default to first account
-          selectAccount(accounts[0].index);
+          selectAccount(accounts[0].index); // Default to first account
           await saveToVault("selectedAccountIndex", accounts[0].index);
         }
       }
@@ -59,33 +57,33 @@ export default function App() {
     setLoadingMessage("Creating wallet...");
     setShowLoadingModal(true);
 
-    // Simulate a small delay for better UX
+    // a small delay for better UX
     await new Promise(resolve => setTimeout(resolve, 500));
 
     try {
-      // 1️⃣ Generate mnemonic (client-side)
+      // 1️ Generate mnemonic (client-side)
       const mnemonic = generateMnemonic(wordlist);
       setGeneratedSeedPhrase(mnemonic);
 
-      // 2️⃣ Encrypt mnemonic
+      // 2️ Encrypt mnemonic
       const encrypted = await encryptMnemonic(mnemonic, password);
       await saveEncryptedMnemonic(encrypted);
 
-      // 3️⃣ Derive first account (index 0)
+      // 3️ Derive first account (index 0)
       const account0 = await deriveAccountLocally(mnemonic, 0);
       // Add default name
       account0.name = 'Account 0';
       const accounts = [account0];
 
-      // 4️⃣ Store accounts
+      // 4️ Store accounts
       await saveToVault("accounts", accounts);
       setWallet(accounts);
-      
+
       // Set first account as selected
       selectAccount(account0.index);
       await saveToVault("selectedAccountIndex", account0.index);
 
-      // 5️⃣ Keep mnemonic ONLY in memory
+      // 5️ Keep mnemonic ONLY in memory
       setMnemonic(mnemonic);
 
       setShowLoadingModal(false);
@@ -118,18 +116,18 @@ export default function App() {
     await new Promise(resolve => setTimeout(resolve, 500));
 
     try {
-      // 1️⃣ Validate mnemonic
+      // 1️ Validate mnemonic
       if (!validateMnemonic(mnemonic, wordlist)) {
         setShowLoadingModal(false);
         toast.error("Invalid mnemonic phrase");
         return;
       }
 
-      // 2️⃣ Encrypt & store
+      // 2️ Encrypt & store
       const encrypted = await encryptMnemonic(mnemonic, password);
       await saveEncryptedMnemonic(encrypted);
 
-      // 3️⃣ Derive first account
+      // 3️ Derive first account
       const account0 = await deriveAccountLocally(mnemonic, 0);
       // Add default name
       account0.name = 'Account 0';
@@ -137,12 +135,12 @@ export default function App() {
 
       await saveToVault("accounts", accounts);
       setWallet(accounts);
-      
+
       // Set first account as selected
       selectAccount(account0.index);
       await saveToVault("selectedAccountIndex", account0.index);
 
-      // 4️⃣ Keep mnemonic only in RAM
+      // 4️ Keep mnemonic only in RAM
       setMnemonic(mnemonic);
 
       setShowLoadingModal(false);
