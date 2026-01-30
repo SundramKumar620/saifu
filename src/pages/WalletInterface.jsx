@@ -41,7 +41,7 @@ export default function WalletInterface({ onBackupWallet }) {
   const [accountToRename, setAccountToRename] = useState(null);
   const [accountToDelete, setAccountToDelete] = useState(null);
   const [privateKey, setPrivateKey] = useState(null);
-  const [passwordModalPurpose, setPasswordModalPurpose] = useState('unlock'); // 'unlock', 'backup', or 'privateKey'
+  const [passwordModalPurpose, setPasswordModalPurpose] = useState('unlock'); // 'unlock', 'backup', 'privateKey', or 'exportKey'
 
   // Load selected account index from vault on mount
   useEffect(() => {
@@ -121,6 +121,44 @@ export default function WalletInterface({ onBackupWallet }) {
       // Same pattern as ManageAccountModal → AdvancedCreateModal
       setShowPasswordModal(false);
       setShowPrivateKeyModal(true);
+    } catch {
+      toast.error('Wrong password');
+    }
+  };
+
+  const handleExportKey = () => {
+    // Always ask for password for better security, even if wallet is unlocked
+    setPasswordModalPurpose('exportKey');
+    setShowPasswordModal(true);
+  };
+
+  const handleExportKeyPassword = async (password) => {
+    try {
+      const encrypted = await loadEncryptedMnemonic();
+      const decryptedMnemonic = await decryptMnemonic(encrypted, password);
+      // Derive private key after password verification
+      const accountIndex = mainAccount?.index || 0;
+      const derivedPrivateKey = derivePrivateKey(decryptedMnemonic, accountIndex);
+
+      const keyData = {
+        privateKey: derivedPrivateKey,
+        address: mainAccount?.address,
+        name: mainAccount?.name || `Account ${mainAccount?.index}`,
+        derivationPath: mainAccount?.derivationPath,
+      };
+
+      const blob = new Blob([JSON.stringify(keyData, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `saifu-key-${mainAccount?.address}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+
+      setShowPasswordModal(false);
+      toast.success('Key exported successfully');
     } catch {
       toast.error('Wrong password');
     }
@@ -255,7 +293,7 @@ export default function WalletInterface({ onBackupWallet }) {
               >
                 Copy
               </button>
-              <button className="action-btn">Export Key</button>
+              <button className="action-btn" onClick={handleExportKey}>Export Key</button>
               <button 
                 className="action-btn"
                 onClick={handlePrivateKeyClick}
@@ -356,14 +394,18 @@ export default function WalletInterface({ onBackupWallet }) {
             ? handleUnlock 
             : passwordModalPurpose === 'backup' 
             ? handleBackupPassword 
-            : handlePrivateKeyPassword
+            : passwordModalPurpose === 'privateKey'
+            ? handlePrivateKeyPassword
+            : handleExportKeyPassword
         }
         title={
           passwordModalPurpose === 'unlock' 
             ? 'Enter Wallet Password' 
             : passwordModalPurpose === 'backup' 
             ? 'Enter Password to Backup' 
-            : 'Enter Password to View Private Key'
+            : passwordModalPurpose === 'privateKey'
+            ? 'Enter Password to View Private Key'
+            : 'Enter Password to Export Key'
         }
       />
 
