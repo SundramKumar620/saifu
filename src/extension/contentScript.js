@@ -25,6 +25,7 @@ window.addEventListener('message', (event) => {
     }
 
     const { type, data } = event.data;
+    const requestId = data.id;
 
     // Check if we're in a valid extension context
     if (!chrome?.runtime?.id) {
@@ -32,7 +33,10 @@ window.addEventListener('message', (event) => {
         window.postMessage({
             target: 'saifu-content',
             type: type,
-            data: { error: 'Extension context not available' }
+            data: {
+                id: requestId,
+                error: 'Extension context not available'
+            }
         }, '*');
         return;
     }
@@ -49,17 +53,23 @@ window.addEventListener('message', (event) => {
             window.postMessage({
                 target: 'saifu-content',
                 type: type,
-                data: { error: chrome.runtime.lastError.message }
+                data: {
+                    id: requestId,
+                    error: chrome.runtime.lastError.message
+                }
             }, '*');
             return;
         }
 
-        // Forward response back to inpage script
+        // Forward response back to inpage script with request ID
         try {
             window.postMessage({
                 target: 'saifu-content',
                 type: type,
-                data: response
+                data: {
+                    id: requestId,
+                    ...response  // This spreads { result: {...} } or { error: "..." }
+                }
             }, '*');
         } catch (error) {
             console.error('Saifu: Failed to post message:', error);

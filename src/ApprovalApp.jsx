@@ -139,8 +139,11 @@ export default function ApprovalApp() {
         );
     }
 
-    // Show unlock screen if wallet is locked
-    if (isLocked) {
+    // Show unlock screen if wallet is locked AND it's a signing operation
+    // Connection requests don't need unlock
+    const requiresUnlock = isLocked && approvalData?.type !== ApprovalTypes.CONNECT;
+
+    if (requiresUnlock) {
         return (
             <div className="approval-container" style={{ backgroundImage: `url(${bg})` }}>
                 <UnlockScreen
