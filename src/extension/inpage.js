@@ -39,9 +39,9 @@ class SaifuWalletProvider extends EventTarget {
 
     _handleMessage(event) {
         if (event.source !== window) return;
-        if (event.data.type !== MessageTypes.RESPONSE) return;
+        if (event.data.target !== 'saifu-content') return;
 
-        const { id, error, result } = event.data;
+        const { id, error, result } = event.data.data || {};
         const pending = this._pendingRequests.get(id);
 
         if (pending) {
@@ -60,11 +60,14 @@ class SaifuWalletProvider extends EventTarget {
             this._pendingRequests.set(id, { resolve, reject });
 
             window.postMessage({
-                type: MessageTypes.REQUEST,
-                id,
-                method,
-                params,
-                origin: window.location.origin,
+                target: 'saifu-inpage',
+                type: method,
+                data: {
+                    id,
+                    method,
+                    params,
+                    origin: window.location.origin,
+                }
             }, '*');
 
             // Timeout after 5 minutes (user might take time to approve)
@@ -268,13 +271,19 @@ function deserializeTransaction(data) {
 if (typeof window !== 'undefined') {
     const provider = new SaifuWalletProvider();
 
-    // Expose as window.solana (standard) and window.saifu
-    Object.defineProperty(window, 'solana', {
-        value: provider,
-        writable: false,
-        configurable: true,
-    });
+    // Check if window.solana already exists (another wallet extension)
+    if (!window.solana) {
+        // Expose as window.solana (standard)
+        Object.defineProperty(window, 'solana', {
+            value: provider,
+            writable: false,
+            configurable: true,
+        });
+    } else {
+        console.warn('🔐 Saifu: window.solana already defined by another wallet');
+    }
 
+    // Always expose as window.saifu
     Object.defineProperty(window, 'saifu', {
         value: provider,
         writable: false,

@@ -1,45 +1,14 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
-import { resolve } from 'path'
-import { copyFileSync, mkdirSync, existsSync, writeFileSync, readFileSync } from 'fs'
+import { resolve, dirname } from 'path'
+import { fileURLToPath } from 'url'
 
-// Plugin to copy extension files after build
-const copyExtensionFiles = () => ({
-  name: 'copy-extension-files',
-  closeBundle() {
-    const distDir = resolve(__dirname, 'dist')
-
-    // Copy manifest.json to dist
-    copyFileSync(
-      resolve(__dirname, 'public/manifest.json'),
-      resolve(distDir, 'manifest.json')
-    )
-
-    // Copy icons
-    const iconsDir = resolve(distDir, 'icons')
-    if (!existsSync(iconsDir)) {
-      mkdirSync(iconsDir, { recursive: true })
-    }
-    ;['icon16.png', 'icon48.png', 'icon128.png'].forEach(icon => {
-      const src = resolve(__dirname, `public/icons/${icon}`)
-      if (existsSync(src)) {
-        copyFileSync(src, resolve(iconsDir, icon))
-      }
-    })
-
-    // Copy logo.svg
-    const logoSrc = resolve(__dirname, 'public/logo.svg')
-    if (existsSync(logoSrc)) {
-      copyFileSync(logoSrc, resolve(distDir, 'logo.svg'))
-    }
-
-    console.log('✅ Extension files copied to dist/')
-  }
-})
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = dirname(__filename)
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [react(), copyExtensionFiles()],
+  plugins: [react()],
   build: {
     rollupOptions: {
       input: {
@@ -61,4 +30,3 @@ export default defineConfig({
     global: 'globalThis',
   }
 })
-
