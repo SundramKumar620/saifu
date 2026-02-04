@@ -1,0 +1,453 @@
+/* Approval Popup Styles - Matching WalletInterface design */
+
+/* Full page container with background */
+.approval-container {
+    min-height: 100vh;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    position: relative;
+    overflow: auto;
+    padding: 20px;
+    box-sizing: border-box;
+    font-family: 'Geist', system-ui, -apple-system, sans-serif;
+}
+
+.approval-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid rgba(255, 255, 255, 0.1);
+    border-top-color: #667eea;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.approval-error {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    padding: 24px;
+    text-align: center;
+    color: #ffffff;
+}
+
+.approval-error h2 {
+    color: #ff6b6b;
+    margin: 0;
+}
+
+.approval-error button {
+    padding: 12px 24px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    color: #fff;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.2s;
+}
+
+.approval-error button:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+/* Main approval card - matching wallet-card exactly */
+.approval-card {
+    padding: 40px 40px;
+    max-width: 420px;
+    width: 90%;
+    border-radius: 50px;
+    position: relative;
+    z-index: 1;
+    animation: cardFadeIn 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    will-change: transform, opacity;
+    background: rgba(0, 0, 0, 0.35);
+    backdrop-filter: blur(30px);
+    -webkit-backdrop-filter: blur(30px);
+    box-shadow: 0px 0px 70px rgba(0, 0, 0, 0.35);
+}
+
+.approval-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 50px;
+    padding: 1px;
+    background: linear-gradient(126.92deg, rgba(255, 255, 255, 0.4) 1.8%, rgba(255, 255, 255, 0) 42.58%, rgba(255, 255, 255, 0) 59.48%, rgba(255, 255, 255, 0.4) 93.12%);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    z-index: -1;
+    pointer-events: none;
+}
+
+@keyframes cardFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px) scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* Header - matching wallet-header */
+.approval-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.approval-header-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.approval-logo {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.approval-logo img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    border-radius: 8px;
+}
+
+.approval-title {
+    font-size: 24px;
+    font-weight: 700;
+    color: #ffffff;
+    margin: 0;
+}
+
+/* Origin badge */
+.approval-origin-badge {
+    background: rgba(102, 126, 234, 0.15);
+    border: 1px solid rgba(102, 126, 234, 0.3);
+    padding: 8px 14px;
+    border-radius: 20px;
+    font-size: 13px;
+    color: #a5b4fc;
+    max-width: 140px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Content Section - matching balance-card style */
+.approval-content {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.03));
+    border-radius: 20px;
+    padding: 24px;
+    margin-bottom: 24px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.approval-section {
+    margin-bottom: 20px;
+}
+
+.approval-section:last-child {
+    margin-bottom: 0;
+}
+
+.approval-label {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 14px;
+    font-weight: 300;
+    letter-spacing: 0.5px;
+    margin-bottom: 10px;
+}
+
+.approval-value {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.9);
+    word-break: break-all;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 14px 16px;
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.approval-address {
+    font-size: 13px;
+    font-family: monospace;
+    color: #a5b4fc;
+}
+
+/* Permissions List */
+.approval-permissions {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.approval-permissions li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px;
+    margin-bottom: 8px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 14px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.approval-permissions li:last-child {
+    margin-bottom: 0;
+}
+
+.permission-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: rgba(102, 126, 234, 0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #667eea;
+    flex-shrink: 0;
+}
+
+/* Warning Box */
+.approval-warning {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 16px;
+    background: rgba(251, 191, 36, 0.08);
+    border: 1px solid rgba(251, 191, 36, 0.2);
+    border-radius: 16px;
+    margin-bottom: 24px;
+}
+
+.approval-warning-icon {
+    font-size: 20px;
+    flex-shrink: 0;
+    line-height: 1;
+}
+
+.approval-warning-text {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.7);
+    line-height: 1.5;
+}
+
+/* Password Input - matching wallet inputs */
+.approval-password {
+    margin-bottom: 24px;
+}
+
+.approval-password input {
+    width: 100%;
+    padding: 14px 16px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    color: #ffffff;
+    font-size: 14px;
+    font-family: inherit;
+    box-sizing: border-box;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    will-change: border-color, background;
+}
+
+.approval-password input:focus {
+    outline: none;
+    border-color: rgba(102, 126, 234, 0.5);
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.approval-password input::placeholder {
+    color: rgba(255, 255, 255, 0.4);
+}
+
+.approval-password-error {
+    color: #ff6b6b;
+    font-size: 13px;
+    margin: 8px 0 0;
+}
+
+/* Action Buttons - matching wallet buttons exactly */
+.approval-actions {
+    display: flex;
+    gap: 12px;
+}
+
+.approval-btn {
+    flex: 1;
+    padding: 14px 24px;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    border: none;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    will-change: transform, opacity;
+}
+
+/* Reject button - matching btn-backup */
+.approval-btn-reject {
+    background: rgba(255, 255, 255, 0.1);
+    color: #ffffff;
+    box-shadow: inset 0px -0.5px 1px rgba(255, 255, 255, 0.78), inset 0px 1.5px 1px rgba(255, 255, 255, 0.8);
+}
+
+.approval-btn-reject:hover:not(:disabled) {
+    transform: scale(0.98);
+    opacity: 0.6;
+}
+
+.approval-btn-reject:active:not(:disabled) {
+    transform: scale(0.94);
+    opacity: 0.9;
+    transition: all 0.1s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Approve button - matching btn-lock (primary CTA) */
+.approval-btn-approve {
+    background: radial-gradient(54.52% 118% at 50% 83%, #FFFFFF 0%, rgba(255, 255, 255, 0) 100%), #3D44F7;
+    background-blend-mode: overlay, normal;
+    box-shadow: inset 0px 1px 3px #FFFFFF, 0 4px 15px rgba(102, 126, 234, 0.3);
+    color: white;
+}
+
+.approval-btn-approve:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: inset 0px 1px 8px rgb(0, 0, 0), 0 6px 20px rgba(14, 17, 33, 0.46);
+    opacity: 0.8;
+    color: #ffffff99;
+}
+
+.approval-btn-approve:active:not(:disabled) {
+    transform: translateY(0) scale(0.98);
+    box-shadow: inset 0px 1px 8px rgba(0, 0, 0, 0.25), 0 2px 8px rgba(102, 126, 234, 0.3);
+    opacity: 0.9;
+    transition: all 0.1s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.approval-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none !important;
+}
+
+/* Message Content Box */
+.message-content {
+    max-height: 120px;
+    overflow-y: auto;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 14px 16px;
+    border-radius: 10px;
+    font-family: monospace;
+    font-size: 13px;
+    white-space: pre-wrap;
+    word-break: break-all;
+    color: rgba(255, 255, 255, 0.9);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Transaction Details */
+.transaction-details {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.transaction-detail {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.transaction-detail-label {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 14px;
+}
+
+.transaction-detail-value {
+    color: #ffffff;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+/* Responsive adjustments */
+@media (max-width: 480px) {
+    .approval-card {
+        padding: 24px 20px;
+        border-radius: 30px;
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .approval-card::before {
+        border-radius: 30px;
+    }
+
+    .approval-header {
+        flex-direction: column;
+        gap: 12px;
+        text-align: center;
+    }
+
+    .approval-header-left {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .approval-title {
+        font-size: 20px;
+    }
+
+    .approval-origin-badge {
+        max-width: none;
+    }
+
+    .approval-content {
+        padding: 16px;
+    }
+
+    .approval-btn {
+        padding: 12px 20px;
+        font-size: 15px;
+    }
+}
