@@ -676,13 +676,16 @@
   }
 
   .address-actions {
-    flex-wrap: wrap;
+    /* valid comment: keep in one row */
   }
 
   .action-btn {
-    min-width: calc(50% - 4px);
+    /* valid comment: equal width */
     font-size: 13px;
     padding: 10px 14px;
+    white-space: nowrap;
+    flex: 1;
+    /* Ensure equal scrolling */
   }
 
   .account-item {
@@ -750,9 +753,11 @@
   }
 
   .action-btn {
-    min-width: 100%;
-    font-size: 12px;
-    padding: 9px 12px;
+    /* min-width: 100%; removed */
+    font-size: 11px;
+    padding: 9px 8px;
+    white-space: nowrap;
+    flex: 1;
   }
 
   .account-item {
