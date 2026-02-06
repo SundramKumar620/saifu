@@ -1,16 +1,18 @@
-import { Connection, PublicKey, LAMPORTS_PER_SOL } from "@solana/web3.js";
-
-const connection = new Connection(
-  "https://devnet.helius-rpc.com/?api-key=15fed2f6-7bb6-4ecd-ab74-62aebb6f71f8",
-  "confirmed"
-);
+import { API_ENDPOINTS } from "../config/config.js";
 
 export async function getSolBalance(address) {
-  const publicKey = new PublicKey(address);
+  try {
+    const res = await fetch(API_ENDPOINTS.SOL_BALANCE(address));
+    const data = await res.json();
 
-  const balanceLamports = await connection.getBalance(publicKey);
+    if (data.error) {
+      throw new Error(data.error);
+    }
 
-  const balanceSOL = balanceLamports / LAMPORTS_PER_SOL;
-
-  return balanceSOL;
+    return data.balance;
+  } catch (error) {
+    console.error("Error fetching SOL balance:", error);
+    throw error;
+  }
 }
+

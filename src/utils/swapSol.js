@@ -1,5 +1,6 @@
 import { Connection, VersionedTransaction, Keypair } from "@solana/web3.js";
 import bs58 from "bs58";
+import { API_ENDPOINTS } from "../config/config.js";
 
 // Tokens configuration
 export const TOKENS = {
@@ -45,12 +46,7 @@ export async function getQuote({
   amount,
   slippageBps = 50,
 }) {
-  const url =
-    `https://quote-api.jup.ag/v6/quote?` +
-    `inputMint=${inputMint}` +
-    `&outputMint=${outputMint}` +
-    `&amount=${amount}` +
-    `&slippageBps=${slippageBps}`;
+  const url = `${API_ENDPOINTS.SWAP_QUOTE}?inputMint=${inputMint}&outputMint=${outputMint}&amount=${amount}&slippageBps=${slippageBps}`;
 
   const res = await fetch(url);
   const json = await res.json();
@@ -66,13 +62,12 @@ export async function getQuote({
  * Get the swap transaction from Jupiter
  */
 export async function getSwapTransaction(quoteResponse, userPublicKey) {
-  const res = await fetch("https://quote-api.jup.ag/v6/swap", {
+  const res = await fetch(API_ENDPOINTS.SWAP_TRANSACTION, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       quoteResponse,
       userPublicKey,
-      wrapAndUnwrapSol: true,
     }),
   });
 

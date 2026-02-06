@@ -1,7 +1,18 @@
-const COINGECKO_API = "https://api.coingecko.com/api/v3/simple/price?ids=solana&vs_currencies=usd";
+import { API_ENDPOINTS } from "../config/config.js";
 
 export async function getSolPriceUsd() {
-  const res = await fetch(COINGECKO_API);
-  const data = await res.json();
-  return data?.solana?.usd ?? null;
+  try {
+    const res = await fetch(API_ENDPOINTS.SOL_PRICE);
+    const data = await res.json();
+
+    if (data.error) {
+      throw new Error(data.error);
+    }
+
+    return data.price;
+  } catch (error) {
+    console.error("Error fetching SOL price:", error);
+    return null;
+  }
 }
+
