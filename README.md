@@ -1,130 +1,173 @@
+Perfect, this is already solid — I’ll **polish it**, **simplify wording**, **remove repetition**, and **clearly state Devnet usage** while keeping it professional and GitHub-ready.
+Below is a **clean, improved README** you can paste directly.
+
+---
+
 # Saifu — Solana HD Wallet (Web + Extension)
 
-**Short description**
-Saifu is a Solana HD wallet implemented as a web app + browser extension. Users can create or import wallets (mnemonic-based), manage accounts, and connect to dApps via a provider injected by the extension (same UX pattern as common Solana wallets).
+**Saifu** is a Solana HD wallet built as a **web application with a browser extension layer**.
+Users can create or import wallets using a mnemonic, manage accounts, and connect to Solana dApps via an injected provider — following the same interaction model as popular Solana wallets.
+
+> ⚠️ **Network:** Saifu currently operates on **Solana Devnet only**.
 
 ---
 
 ## Key features
 
-* Create / import HD wallets (BIP39 mnemonic) in the browser.
-* Mnemonic **never** leaves the frontend; stored encrypted in IndexedDB.
-* Password-based encryption, with lock/unlock functionality that loads the mnemonic into RAM only when unlocked.
-* Web app for wallet management, plus a browser extension that injects `window.solana` to enable dApp connections (similar to how popular wallets work: Phantom and Backpack).
-* Backend (optional) for RPC and additional services (your backend repo). ([GitHub][1])
+* Create and import HD wallets (BIP39 mnemonic)
+* Mnemonic **never leaves the frontend**
+* Encrypted mnemonic storage using **IndexedDB**
+* Password-based lock / unlock mechanism
+* Mnemonic is loaded into **memory (RAM) only when unlocked**
+* Web wallet UI for managing accounts
+* Browser extension injects `window.solana` for dApp connectivity
+* Optional backend for RPC helpers and services
+
+---
+
+## Network configuration
+
+* **Solana Network:** `devnet`
+* Used for:
+
+  * Wallet creation and testing
+  * dApp connections
+  * Transaction signing
+* This project is intended for **development and learning purposes**
+* Do **not** use with real funds
 
 ---
 
 ## Project layout (high level)
 
-* `saifu/` — frontend + extension source (UI, wallet logic, extension manifest).
-* `saifu-backend/` — server-side code for RPC helpers, indexing, analytics, etc. (see `.env.example` in backend).
-* Branches:
+* `saifu/`
+  Frontend wallet + extension source
+  (UI, wallet logic, encryption, provider injection)
 
-  * `main` — stable / production-ready (RPC config + stable features)
-  * `dev` — active development for the web app
-  * `extension` — extension-specific code and builds
+* `saifu-backend/`
+  Optional backend for RPC helpers and services
+  (see `.env.example` in backend repo)
 
----
+### Branches
 
-## Security design (read carefully)
-
-* **Mnemonic storage**: mnemonic is encrypted with a user-chosen password and stored in **IndexedDB** on the client. It is **never** sent to the backend or remote servers.
-* **Unlock workflow**: when the user unlocks with the password, the mnemonic is decrypted and loaded **into RAM** for wallet operations; when locked, it is cleared from memory.
-* **Threat model**: browser local storage / IndexedDB can be targeted by XSS; minimize attack surface by:
-
-  * Avoiding `eval` / unsafe inline scripts.
-  * Using Content Security Policy (CSP) for your hosted web app.
-  * Keeping dependencies up to date and auditing packages.
-* **Backend trust**: do not send mnemonic, private keys, or raw seed phrases to backend endpoints. Only send signed transactions or public keys.
+* `main` — stable branch (devnet, tested features)
+* `dev` — active development for web wallet
+* `extension` — browser extension–specific work
 
 ---
 
-## Quick start — development
+## Security design
 
-### Prereqs
+Security is **frontend-first**.
 
-* Node.js (v16+ recommended)
-* npm / yarn
-* Chrome / Chromium for extension testing
+### Mnemonic handling
 
-### Frontend (dev)
+* Mnemonic is generated or imported **in the browser**
+* Encrypted using a user-defined password
+* Stored only in **IndexedDB**
+* **Never** sent to backend or external servers
 
-```bash
-# from saifu/
-npm install
-npm run dev
-# or
-yarn
-yarn dev
-```
+### Lock / unlock flow
 
-### Backend (dev)
+* **Locked**
 
-(see `saifu-backend/.env.example` in the backend repo for required env vars). Example:
+  * No mnemonic in memory
+  * Only encrypted data exists locally
+* **Unlocked**
 
-```bash
-# from saifu-backend/
-cp .env.example .env
-# set environment variables
-npm install
-node server.js
-# or
-npm run start
-```
+  * Mnemonic is decrypted
+  * Loaded into RAM temporarily
+  * Used for key derivation and signing
+* On lock, refresh, or close → mnemonic is removed from memory
 
-(Your backend repo already contains `server.js` and a `.env.example` file — keep secrets in environment variables). ([GitHub][2])
+### Backend trust model
 
----
+* Backend never receives:
 
-## Extension — load in Chrome (development)
+  * mnemonic
+  * private keys
+  * passwords
+* Backend only handles:
 
-1. Build the extension bundle (replace with your actual build command):
-
-   ```bash
-   npm run build:extension
-   ```
-2. Open `chrome://extensions/`, enable **Developer mode**.
-3. Click **Load unpacked**, choose your extension `dist/` or `build/` folder (where `manifest.json` lives).
-4. The extension injects a provider at `window.solana` used by dApps to request connection/signing.
-
-**Note:** dApp detection expects an injected provider at `window.solana`. Ensure provider API matches the standard Solana wallet adapter methods.
+  * RPC helpers
+  * public keys
+  * signed transactions (if needed)
 
 ---
 
-## How to use (user flows)
+## How users use Saifu
 
-* **Create wallet** — user sets password → generates mnemonic → encrypt & store in IndexedDB → show derived public address(es).
-* **Import wallet** — user pastes mnemonic → password to encrypt → store in IndexedDB.
-* **Lock / Unlock** — Lock clears mnemonic from RAM. Unlock decrypts from IndexedDB into RAM for signing.
-* **Connect to dApp** — when a dApp calls `window.solana.connect()`, the extension UI prompts the user to approve connection and account selection.
+### Create wallet
+
+1. User sets a password
+2. Mnemonic is generated locally
+3. Mnemonic is encrypted and stored in IndexedDB
+4. Public address is derived and shown
+
+### Import wallet
+
+1. User enters an existing mnemonic
+2. Mnemonic is encrypted with password
+3. Stored locally in IndexedDB
+
+### Lock & unlock
+
+* Lock clears mnemonic from memory
+* Unlock decrypts mnemonic for signing
+
+### Connect to dApps
+
+* dApps request connection using `window.solana`
+* User approves connection
+* Public key is shared
+* Transactions require explicit approval
 
 ---
 
-## API (backend) — example endpoints
+## Backend (separate repository)
 
-*(Put the actual endpoints from your backend here; below are placeholders — replace with your real routes from `saifu-backend`.)*
+Backend code lives here:
+👉 [https://github.com/SundramKumar620/saifu-backend](https://github.com/SundramKumar620/saifu-backend)
 
-* `GET /health` — health check
-* `POST /rpc/proxy` — proxy RPC calls (if you use a middle layer for rate limiting)
-* `GET /price/:token` — token price helpers
+Backend responsibilities:
+
+* RPC proxy / helpers
+* Optional indexing or analytics
+* Network utilities
+
+Frontend works independently without backend.
+
+---
+
+## API (backend – example)
+
+> Replace with real endpoints from `saifu-backend`
+
+* `GET /health` — service status
+* `POST /rpc/proxy` — RPC forwarding
+* `GET /price/:token` — token price helper
+
+---
 
 ## Contributing
 
-* Fork → branch from `dev` → PR to `dev` (or `extension` if change is extension-specific).
-* Follow secure coding guidelines for web crypto and browser extension best practices.
-* Add changelog entries and update the README when adding new features.
+* Fork the repo
+* Create a branch from `dev`
+* Submit PRs to `dev` or `extension`
+* Follow secure coding practices for browser crypto
+* Update README if behavior changes
 
 ---
 
-Disclaimer
-
-This project is under active development.
-Use at your own risk.
-Do not store large amounts until fully audited.
-
 ## Known limitations & TODOs
 
-* Improve UI for multiple accounts and account derivation paths.
-* Add hardware wallet support (e.g., Ledger)
-* Add Websocket
+* No hardware wallet support
+* No WebSocket subscriptions yet
+---
+
+## Disclaimer
+
+This project is under active development.
+It is **not audited**.
+Use **Devnet only** and do not store real funds.
+
