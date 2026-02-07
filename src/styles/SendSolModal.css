@@ -1,0 +1,124 @@
+.send-sol-modal {
+    width: 100%;
+}
+
+.balance-display {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 14px 16px;
+    margin-bottom: 20px;
+}
+
+.balance-display .balance-label {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 14px;
+}
+
+.balance-display .balance-value {
+    color: #ffffff;
+    font-weight: 600;
+    font-size: 16px;
+}
+
+.input-group {
+    margin-bottom: 16px;
+}
+
+.input-label {
+    display: block;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 14px;
+    margin-bottom: 8px;
+    font-weight: 500;
+}
+
+.send-input {
+    width: 100%;
+    padding: 14px 16px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    color: #ffffff;
+    font-size: 14px;
+    box-sizing: border-box;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.send-input:focus {
+    outline: none;
+    border-color: rgba(102, 126, 234, 0.5);
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.send-input::placeholder {
+    color: rgba(255, 255, 255, 0.4);
+}
+
+.send-input:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.amount-input-wrapper {
+    display: flex;
+    gap: 10px;
+}
+
+.amount-input {
+    flex: 1;
+}
+
+.max-btn {
+    padding: 14px 20px;
+    background: rgba(102, 126, 234, 0.2);
+    border: 1px solid rgba(102, 126, 234, 0.3);
+    border-radius: 10px;
+    color: #667eea;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.max-btn:hover:not(:disabled) {
+    background: rgba(102, 126, 234, 0.3);
+    border-color: rgba(102, 126, 234, 0.5);
+}
+
+.max-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Hide number input spinners */
+.amount-input::-webkit-outer-spin-button,
+.amount-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.amount-input[type=number] {
+    -moz-appearance: textfield;
+    appearance: textfield;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+    .balance-display {
+        flex-direction: column;
+        gap: 8px;
+        text-align: center;
+    }
+
+    .amount-input-wrapper {
+        flex-direction: column;
+    }
+
+    .max-btn {
+        width: 100%;
+    }
+}

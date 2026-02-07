@@ -6,16 +6,23 @@ import { loadEncryptedMnemonic, saveToVault, loadFromVault } from '../db/walletD
 import { decryptMnemonic } from '../crypto/crypto';
 import { deriveAccountLocally, derivePrivateKey } from '../crypto/deriveAccount';
 import { getMaxAccountIndex, accountExists } from '../utils/accountUtils';
+import { getSolBalance } from '../utils/solanaBalance';
+import { getSolPriceUsd } from '../utils/solPrice';
+import { getTokenBalances } from '../utils/tokenBalance';
 import PasswordModal from '../components/PasswordModal';
 import ManageAccountModal from '../components/ManageAccountModal';
 import AdvancedCreateModal from '../components/AdvancedCreateModal';
 import RenameAccountModal from '../components/RenameAccountModal';
 import DeleteAccountModal from '../components/DeleteAccountModal';
 import PrivateKeyModal from '../components/PrivateKeyModal';
+import SendSolModal from '../components/SendSolModal';
+import ReceiveModal from '../components/ReceiveModal';
+import LoadingModal from '../components/LoadingModal';
+import { sendSol } from '../utils/sendSol';
 import '../styles/WalletInterface.css';
 import bg from '../assets/bg.png';
 import logo from '../assets/logo.png';
-import { Plus, SquarePen,X } from 'lucide-react';
+import { Plus, SquarePen, X, Send, ArrowDownToLine, Repeat, RefreshCw } from 'lucide-react';
 
 export default function WalletInterface({ onBackupWallet }) {
   const {
@@ -42,6 +49,14 @@ export default function WalletInterface({ onBackupWallet }) {
   const [accountToDelete, setAccountToDelete] = useState(null);
   const [privateKey, setPrivateKey] = useState(null);
   const [passwordModalPurpose, setPasswordModalPurpose] = useState('unlock'); // 'unlock', 'backup', 'privateKey', or 'exportKey'
+  const [balance, setBalance] = useState(null);
+  const [solPriceUsd, setSolPriceUsd] = useState(null);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [tokens, setTokens] = useState([]);
+  const [tokensLoading, setTokensLoading] = useState(true);
+  const [showSendModal, setShowSendModal] = useState(false);
+  const [showReceiveModal, setShowReceiveModal] = useState(false);
+  const [isSending, setIsSending] = useState(false);
 
   // Load selected account index from vault on mount
   useEffect(() => {
@@ -64,6 +79,65 @@ export default function WalletInterface({ onBackupWallet }) {
   const mainAccount = accounts.find(acc => acc.index === selectedAccountIndex) || accounts[0];
   // Show ALL accounts in manage account section, not just non-selected ones
   const allAccounts = accounts;
+
+  // Fetch SOL balance when main account changes
+  useEffect(() => {
+    if (!mainAccount?.address) {
+      setBalance(null);
+      return;
+    }
+    let cancelled = false;
+    getSolBalance(mainAccount.address)
+      .then((sol) => {
+        if (!cancelled) setBalance(sol);
+      })
+      .catch(() => {
+        if (!cancelled) setBalance(null);
+      });
+    return () => { cancelled = true; };
+  }, [mainAccount?.address]);
+
+  // Fetch SOL/USD price on mount only (no polling)
+  useEffect(() => {
+    let cancelled = false;
+    getSolPriceUsd()
+      .then((price) => {
+        if (!cancelled) setSolPriceUsd(price);
+      })
+      .catch(() => { });
+    return () => { cancelled = true; };
+  }, []);
+
+  // Manual refresh - fetches latest balance and price (handles partial success)
+  const handleRefresh = async () => {
+    if (isRefreshing) return;
+    setIsRefreshing(true);
+    try {
+      const [balanceResult, priceResult] = await Promise.allSettled([
+        mainAccount?.address ? getSolBalance(mainAccount.address) : Promise.resolve(null),
+        getSolPriceUsd(),
+      ]);
+
+      if (balanceResult.status === "fulfilled" && mainAccount?.address) {
+        setBalance(balanceResult.value);
+      }
+      if (priceResult.status === "fulfilled" && priceResult.value != null) {
+        setSolPriceUsd(priceResult.value);
+      }
+
+      const balanceOk = balanceResult.status === "fulfilled";
+      const priceOk = priceResult.status === "fulfilled" && priceResult.value != null;
+      if (balanceOk || priceOk) {
+        toast.success("Balance updated");
+      } else {
+        toast.error("Failed to refresh");
+      }
+    } catch {
+      toast.error("Failed to refresh");
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
 
   const handleUnlock = async (password) => {
     try {
@@ -116,7 +190,7 @@ export default function WalletInterface({ onBackupWallet }) {
       const accountIndex = mainAccount?.index || 0;
       const derivedPrivateKey = derivePrivateKey(decryptedMnemonic, accountIndex);
       setPrivateKey(derivedPrivateKey);
-      
+
       // Close password modal and immediately open private key modal
       // Same pattern as ManageAccountModal → AdvancedCreateModal
       setShowPasswordModal(false);
@@ -164,6 +238,55 @@ export default function WalletInterface({ onBackupWallet }) {
     }
   };
 
+  // Send SOL handlers
+  const [pendingSend, setPendingSend] = useState(null);
+
+  const handleSendClick = () => {
+    if (walletLocked) {
+      toast.error('Unlock wallet first');
+      return;
+    }
+    setShowSendModal(true);
+  };
+
+  const handleSendSol = async (recipientAddress, amount) => {
+    // Store pending send details and ask for password
+    setPendingSend({ recipientAddress, amount });
+    setPasswordModalPurpose('send');
+    setShowSendModal(false);
+    setShowPasswordModal(true);
+  };
+
+  const handleSendPassword = async (password) => {
+    if (!pendingSend) return;
+
+    setIsSending(true);
+    try {
+      const encrypted = await loadEncryptedMnemonic();
+      const decryptedMnemonic = await decryptMnemonic(encrypted, password);
+      const accountIndex = mainAccount?.index || 0;
+      const derivedPrivateKey = derivePrivateKey(decryptedMnemonic, accountIndex);
+
+      const signature = await sendSol(
+        derivedPrivateKey,
+        pendingSend.recipientAddress,
+        pendingSend.amount
+      );
+
+      setShowPasswordModal(false);
+      setPendingSend(null);
+      toast.success(`Sent ${pendingSend.amount} SOL successfully!`);
+
+      // Refresh balance after sending
+      if (mainAccount?.address) {
+        getSolBalance(mainAccount.address).then(setBalance).catch(() => { });
+      }
+    } catch (error) {
+      toast.error(error.message || 'Failed to send SOL');
+    } finally {
+      setIsSending(false);
+    }
+  };
 
   const handleCreateAccount = async () => {
     if (walletLocked) {
@@ -264,55 +387,153 @@ export default function WalletInterface({ onBackupWallet }) {
     return account.name || `Account ${account.index}`;
   };
 
+  // Fetch SPL tokens when main account changes
+  useEffect(() => {
+    if (!mainAccount?.address) {
+      setTokens([]);
+      setTokensLoading(false);
+      return;
+    }
+    let cancelled = false;
+    setTokensLoading(true);
+    getTokenBalances(mainAccount.address)
+      .then((tokenData) => {
+        if (!cancelled) {
+          setTokens(tokenData);
+          setTokensLoading(false);
+        }
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setTokens([]);
+          setTokensLoading(false);
+        }
+      });
+    return () => { cancelled = true; };
+  }, [mainAccount?.address]);
+
   return (
     <div className="wallet-interface" style={{ backgroundImage: `url(${bg})` }}>
       <div className="wallet-card glassmorphism">
+        {/* 1. Wallet Header - Logo/text left, fetch button right */}
         <div className="wallet-header">
-          <div className="logo-container">
+          <div className="wallet-header-left">
             <div className="logo">
               <img src={logo} alt="Saifu Logo" />
             </div>
+            <h1 className="wallet-title">Saifu</h1>
           </div>
-          <h1 className="wallet-title">Welcome to Saifu</h1>
-          <p className="wallet-subtitle">Solana HD Wallet</p>
+          <button
+            className="fetch-refresh-btn"
+            onClick={handleRefresh}
+            disabled={isRefreshing}
+            title="Refresh balance and price"
+          >
+            <RefreshCw size={16} className={isRefreshing ? 'refresh-spin' : ''} />
+          </button>
         </div>
 
-        <div className="main-account-section">
-          <h2 className="section-title">Main Account</h2>
-          <div className="address-container">
-            <input
-              type="text"
-              value={mainAccount?.address || ''}
-              readOnly
-              className="address-input"
-            />
-            <div className="address-actions">
-              <button
-                className="action-btn"
-                onClick={() => copyToClipboard(mainAccount?.address)}
-              >
-                Copy
-              </button>
-              <button className="action-btn" onClick={handleExportKey}>Export Key</button>
-              <button 
-                className="action-btn"
-                onClick={handlePrivateKeyClick}
-              >
-                Private Key
-              </button>
+        {/* 2. Balance Card - Big */}
+        <div className="balance-card">
+          <div className="balance-label">Total Balance</div>
+          <div className="balance-amount">
+            {mainAccount?.address
+              ? balance != null
+                ? `${balance.toFixed(4)} SOL`
+                : 'Loading...'
+              : '0.0000 SOL'}
+          </div>
+          {mainAccount?.address && (
+            <div className="balance-usd">
+              {solPriceUsd != null && balance != null
+                ? `≈ $${(balance * solPriceUsd).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+                : solPriceUsd != null
+                  ? 'Loading balance...'
+                  : 'Loading price...'}
+            </div>
+          )}
+        </div>
+
+        {/* 3. Action Buttons - Send, Receive, Swap */}
+        <div className="action-buttons-grid">
+          <button className="action-square-btn" onClick={handleSendClick}>
+            <Send size={24} />
+            <span>Send</span>
+          </button>
+          <button className="action-square-btn" onClick={() => setShowReceiveModal(true)}>
+            <ArrowDownToLine size={24} />
+            <span>Receive</span>
+          </button>
+          <button className="action-square-btn" onClick={() => toast('Swap coming soon')}>
+            <Repeat size={24} />
+            <span>Swap</span>
+          </button>
+          <button
+            className="action-square-btn"
+            onClick={() => setShowManageAccountModal(true)}
+          >
+            <Plus size={24} />
+            <span>Add</span>
+          </button>
+        </div>
+
+        {/* 4. Account Details - Current Selected Account */}
+        {mainAccount && (
+          <div className="account-details-section">
+            <h2 className="section-title">Current Account</h2>
+            <div className="address-container">
+              <input
+                type="text"
+                value={mainAccount.address}
+                readOnly
+                className="address-input"
+              />
+              <div className="address-actions">
+                <button className="action-btn" onClick={() => copyToClipboard(mainAccount.address)}>
+                  Copy
+                </button>
+                <button className="action-btn" onClick={handleExportKey}>Export Key</button>
+                <button className="action-btn" onClick={handlePrivateKeyClick}>Private Key</button>
+              </div>
             </div>
           </div>
+        )}
+
+        {/* 5. Token Section - SPL Tokens */}
+        <div className="token-section">
+          <h2 className="section-title">Tokens</h2>
+          <div className="token-list">
+            {tokensLoading ? (
+              <p className="no-tokens">Loading tokens...</p>
+            ) : tokens.length === 0 ? (
+              <p className="no-tokens">No tokens found</p>
+            ) : (
+              tokens.map((token) => (
+                <div key={token.mint} className="token-item">
+                  {token.logo ? (
+                    <img src={token.logo} alt={token.symbol} className="token-icon-img" />
+                  ) : (
+                    <div className="token-icon">{token.symbol.slice(0, 1)}</div>
+                  )}
+                  <div className="token-info">
+                    <div className="token-name">{token.name}</div>
+                    <div className="token-symbol">{token.symbol}</div>
+                  </div>
+                  <div className="token-balance">
+                    <div className="token-amount">
+                      {token.balance.toFixed(4)} {token.symbol}
+                    </div>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
         </div>
 
+        {/* 6. Manage Account Section */}
         <div className="manage-account-section">
           <div className="section-header">
             <h2 className="section-title">Manage Account</h2>
-            <button
-              className="add-account-btn"
-              onClick={() => setShowManageAccountModal(true)}
-            >
-              <Plus size={16} />
-            </button>
           </div>
           <div className="accounts-list">
             {allAccounts.map((account) => (
@@ -390,22 +611,26 @@ export default function WalletInterface({ onBackupWallet }) {
         isOpen={showPasswordModal}
         onClose={() => setShowPasswordModal(false)}
         onSubmit={
-          passwordModalPurpose === 'unlock' 
-            ? handleUnlock 
-            : passwordModalPurpose === 'backup' 
-            ? handleBackupPassword 
-            : passwordModalPurpose === 'privateKey'
-            ? handlePrivateKeyPassword
-            : handleExportKeyPassword
+          passwordModalPurpose === 'unlock'
+            ? handleUnlock
+            : passwordModalPurpose === 'backup'
+              ? handleBackupPassword
+              : passwordModalPurpose === 'privateKey'
+                ? handlePrivateKeyPassword
+                : passwordModalPurpose === 'send'
+                  ? handleSendPassword
+                  : handleExportKeyPassword
         }
         title={
-          passwordModalPurpose === 'unlock' 
-            ? 'Enter Wallet Password' 
-            : passwordModalPurpose === 'backup' 
-            ? 'Enter Password to Backup' 
-            : passwordModalPurpose === 'privateKey'
-            ? 'Enter Password to View Private Key'
-            : 'Enter Password to Export Key'
+          passwordModalPurpose === 'unlock'
+            ? 'Enter Wallet Password'
+            : passwordModalPurpose === 'backup'
+              ? 'Enter Password to Backup'
+              : passwordModalPurpose === 'privateKey'
+                ? 'Enter Password to View Private Key'
+                : passwordModalPurpose === 'send'
+                  ? 'Enter Password to Send SOL'
+                  : 'Enter Password to Export Key'
         }
       />
 
@@ -460,6 +685,25 @@ export default function WalletInterface({ onBackupWallet }) {
           }, 300);
         }}
         privateKey={privateKey}
+      />
+
+      <SendSolModal
+        isOpen={showSendModal}
+        onClose={() => setShowSendModal(false)}
+        onSend={handleSendSol}
+        balance={balance}
+        isLoading={isSending}
+      />
+
+      <ReceiveModal
+        isOpen={showReceiveModal}
+        onClose={() => setShowReceiveModal(false)}
+        address={mainAccount?.address || ''}
+      />
+
+      <LoadingModal
+        isOpen={isSending}
+        message="Sending SOL..."
       />
     </div>
   );

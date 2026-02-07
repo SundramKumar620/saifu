@@ -88,6 +88,23 @@ export default function HeroSection({ onGetStarted }) {
                         <button className="btn-hero-primary" onClick={onGetStarted}>
                             Get Started
                         </button>
+                        <button
+                            className="btn-hero-secondary"
+                            onClick={() => {
+                                // Trigger download
+                                const link = document.createElement('a');
+                                link.href = '/Saifu.zip';
+                                link.download = 'Saifu.zip';
+                                document.body.appendChild(link);
+                                link.click();
+                                document.body.removeChild(link);
+
+                                // Open video tutorial
+                                window.open('https://youtu.be/cSTSvZpKoRw', '_blank'); // TODO: Replace with actual video URL
+                            }}
+                        >
+                            Use as Extension
+                        </button>
                     </div>
                 </div>
 
