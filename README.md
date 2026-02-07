@@ -1,17 +1,9 @@
-Perfect, this is already solid — I’ll **polish it**, **simplify wording**, **remove repetition**, and **clearly state Devnet usage** while keeping it professional and GitHub-ready.
-Below is a **clean, improved README** you can paste directly.
-
----
-
 # Saifu — Solana HD Wallet (Web + Extension)
 
 **Saifu** is a Solana HD wallet built as a **web application with a browser extension layer**.
 Users can create or import wallets using a mnemonic, manage accounts, and connect to Solana dApps via an injected provider — following the same interaction model as popular Solana wallets.
 
 <img width="1607" height="1080" alt="saifu-flax vercel app_" src="https://github.com/user-attachments/assets/c45bbf07-cc55-4b3b-8378-b8925c529c84" />
-
-
-> ⚠️ **Network:** Saifu currently operates on **Solana Devnet only**.
 
 ---
 
