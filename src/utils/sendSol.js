@@ -1,12 +1,76 @@
+// frontend/src/utils/sendSol.js
 import { Connection, PublicKey, Transaction, SystemProgram, LAMPORTS_PER_SOL, Keypair } from "@solana/web3.js";
 import bs58 from "bs58";
 import { API_ENDPOINTS } from "../config/config.js";
 
-// Use backend RPC proxy instead of direct Helius connection
+// Use backend proxy for HTTP RPC calls only (no WebSocket)
 const connection = new Connection(
     API_ENDPOINTS.RPC_PROXY,
-    "confirmed"
+    {
+        commitment: "confirmed",
+        disableRetryOnRateLimit: false,
+    }
 );
+
+/**
+ * Poll for transaction confirmation using getSignatureStatuses
+ * @param {string} signature - Transaction signature
+ * @param {number} timeoutSeconds - Maximum time to wait in seconds
+ * @returns {Promise<void>}
+ */
+async function confirmTransactionPolling(signature, timeoutSeconds = 30) {
+    return new Promise((resolve, reject) => {
+        const pollInterval = 1000; // Poll every 1 second
+        const startTime = Date.now();
+        let attempt = 0;
+        let intervalId; // Declare intervalId here so it's accessible for clearInterval
+
+        const checkStatus = async () => {
+            attempt++;
+            const elapsed = Math.floor((Date.now() - startTime) / 1000);
+
+            try {
+                const { value } = await connection.getSignatureStatuses([signature]);
+                const status = value[0];
+
+                if (status) {
+                    // Check if confirmed or finalized
+                    if (status.confirmationStatus === 'confirmed' ||
+                        status.confirmationStatus === 'finalized') {
+
+                        clearInterval(intervalId);
+
+                        // Check for transaction errors
+                        if (status.err) {
+                            reject(new Error(`Transaction failed: ${JSON.stringify(status.err)} `));
+                            return;
+                        }
+
+                        resolve();
+                        return;
+                    }
+                }
+
+                // Check timeout
+                if (elapsed >= timeoutSeconds) {
+                    clearInterval(intervalId);
+                    reject(new Error(`Transaction confirmation timeout after ${timeoutSeconds} s.Signature: ${signature} `));
+                }
+
+            } catch (error) {
+                if (error.message.includes('Transaction failed')) {
+                    clearInterval(intervalId);
+                    reject(error);
+                    return;
+                }
+            }
+        };
+
+        // Start polling immediately, then every interval
+        checkStatus();
+        intervalId = setInterval(checkStatus, pollInterval);
+    });
+}
 
 /**
  * Send SOL from one account to another
@@ -45,7 +109,7 @@ export async function sendSol(privateKeyBase58, toAddress, amountSol) {
     );
 
     // Get recent blockhash
-    const { blockhash } = await connection.getLatestBlockhash();
+    const { blockhash } = await connection.getLatestBlockhash('confirmed');
     transaction.recentBlockhash = blockhash;
     transaction.feePayer = fromKeypair.publicKey;
 
@@ -53,8 +117,7 @@ export async function sendSol(privateKeyBase58, toAddress, amountSol) {
     transaction.sign(fromKeypair);
     const signature = await connection.sendRawTransaction(transaction.serialize());
 
-    // Wait for confirmation
-    await connection.confirmTransaction(signature, "confirmed");
+    await confirmTransactionPolling(signature, 30);
 
     return signature;
 }

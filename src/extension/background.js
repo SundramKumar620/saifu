@@ -7,21 +7,34 @@ import { MessageTypes, ApprovalTypes } from './messageTypes.js';
 let connectedSites = new Map(); // origin -> { publicKey, connected }
 let pendingApprovals = new Map(); // approvalId -> { resolve, reject, type, data }
 let approvalId = 0;
+let isInitialized = false;
 
 // Initialize from storage on startup
 async function initialize() {
+    if (isInitialized) return;
+
     try {
         const stored = await chrome.storage.local.get(['connectedSites']);
-        if (stored.connectedSites) {
+        if (stored?.connectedSites) {
             connectedSites = new Map(Object.entries(stored.connectedSites));
         }
+        isInitialized = true;
         console.log('🔐 Saifu background initialized');
     } catch (error) {
         console.error('Failed to initialize:', error);
+        // Retry after delay
+        setTimeout(initialize, 1000);
     }
 }
 
-initialize();
+// Initialize on proper lifecycle events
+chrome.runtime.onInstalled.addListener(() => {
+    initialize();
+});
+
+chrome.runtime.onStartup.addListener(() => {
+    initialize();
+});
 
 // Save connected sites to storage
 async function saveConnectedSites() {
@@ -237,10 +250,12 @@ async function handleApprovalResponse(approvalId, approved, data) {
 
 // Message handler
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-    const { type, params, origin } = message;
-
     // Handle async operations
     (async () => {
+        // Ensure initialized before handling messages
+        await initialize();
+
+        const { type, params, origin } = message;
         let response;
 
         switch (type) {

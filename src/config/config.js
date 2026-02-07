@@ -1,5 +1,5 @@
 // Backend API configuration
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://prospective-helen-sundramkumar-ff6004d5.koyeb.app';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
 export const API_ENDPOINTS = {
     SOL_BALANCE: (address) => `${API_BASE_URL}/api/sol-balance/${address}`,
