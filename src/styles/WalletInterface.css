@@ -1,5 +1,6 @@
 .wallet-interface {
   min-height: 100vh;
+  width: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -777,3 +778,5 @@
     font-size: 15px;
   }
 }
+
+/* Receive Modal Styles */

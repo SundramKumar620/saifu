@@ -1,5 +1,6 @@
 import { Connection, VersionedTransaction, Keypair } from "@solana/web3.js";
 import bs58 from "bs58";
+import { API_ENDPOINTS } from "../config/config.js";
 
 // Tokens configuration
 export const TOKENS = {
@@ -30,9 +31,9 @@ export const TOKENS = {
   },
 };
 
-// Connection to mainnet (Jupiter only works on mainnet)
+// Use backend RPC proxy (Note: Jupiter works on mainnet, backend should proxy to mainnet for swaps)
 const connection = new Connection(
-  "https://api.mainnet-beta.solana.com",
+  API_ENDPOINTS.RPC_PROXY,
   "confirmed"
 );
 

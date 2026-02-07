@@ -1,7 +1,7 @@
-const HELIUS_API_KEY = "15fed2f6-7bb6-4ecd-ab74-62aebb6f71f8";
+import { API_ENDPOINTS } from "../config/config.js";
 
 export async function getTokenBalances(address) {
-    const url = `https://api-devnet.helius.xyz/v0/addresses/${address}/balances?api-key=${HELIUS_API_KEY}`;
+    const url = API_ENDPOINTS.TOKEN_BALANCES(address);
 
     try {
         const res = await fetch(url);

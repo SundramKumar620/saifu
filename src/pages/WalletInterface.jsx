@@ -16,6 +16,7 @@ import RenameAccountModal from '../components/RenameAccountModal';
 import DeleteAccountModal from '../components/DeleteAccountModal';
 import PrivateKeyModal from '../components/PrivateKeyModal';
 import SendSolModal from '../components/SendSolModal';
+import ReceiveModal from '../components/ReceiveModal';
 import LoadingModal from '../components/LoadingModal';
 import { sendSol } from '../utils/sendSol';
 import '../styles/WalletInterface.css';
@@ -54,6 +55,7 @@ export default function WalletInterface({ onBackupWallet }) {
   const [tokens, setTokens] = useState([]);
   const [tokensLoading, setTokensLoading] = useState(true);
   const [showSendModal, setShowSendModal] = useState(false);
+  const [showReceiveModal, setShowReceiveModal] = useState(false);
   const [isSending, setIsSending] = useState(false);
 
   // Load selected account index from vault on mount
@@ -458,7 +460,7 @@ export default function WalletInterface({ onBackupWallet }) {
             <Send size={24} />
             <span>Send</span>
           </button>
-          <button className="action-square-btn" onClick={() => toast('Receive coming soon')}>
+          <button className="action-square-btn" onClick={() => setShowReceiveModal(true)}>
             <ArrowDownToLine size={24} />
             <span>Receive</span>
           </button>
@@ -691,6 +693,12 @@ export default function WalletInterface({ onBackupWallet }) {
         onSend={handleSendSol}
         balance={balance}
         isLoading={isSending}
+      />
+
+      <ReceiveModal
+        isOpen={showReceiveModal}
+        onClose={() => setShowReceiveModal(false)}
+        address={mainAccount?.address || ''}
       />
 
       <LoadingModal
