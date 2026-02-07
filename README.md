@@ -109,31 +109,6 @@ npm run start
 * `POST /rpc/proxy` — proxy RPC calls (if you use a middle layer for rate limiting)
 * `GET /price/:token` — token price helpers
 
-Add the real endpoints and request/response examples in the backend README.
-
----
-
-## Environment variables (examples)
-
-Add these to `.env` (backend):
-
-```
-PORT=3000
-RPC_URL=https://api.mainnet-beta.solana.com
-# any API keys for third-party services
-```
-
-(Your backend repo’s `.env.example` file should list the real variables). ([GitHub][2])
-
----
-
-## Tests & CI
-
-* Add unit tests for mnemonic encryption/decryption and for the provider injection.
-* Integration tests for signing flows (use a local Solana test validator or mock provider).
-
----
-
 ## Contributing
 
 * Fork → branch from `dev` → PR to `dev` (or `extension` if change is extension-specific).
@@ -145,31 +120,5 @@ RPC_URL=https://api.mainnet-beta.solana.com
 ## Known limitations & TODOs
 
 * Improve UI for multiple accounts and account derivation paths.
-* Add hardware wallet support (e.g., Ledger) via WebHID/WebUSB later.
-* Add CSP and automated dependency auditing in CI.
-
----
-
-## License & Contact
-
-Add your preferred license (e.g., MIT) and how contributors can reach you.
-
----
-
-# Short commit message suggestion
-
-```
-docs: enhance README — add security notes, dev setup, extension guide, and architecture overview
-```
-
----
-
-If you want, I can:
-
-* 1. produce a separate `README-backend.md` (tailored to the backend with all real endpoints and `.env` keys), or
-* 2. open a PR draft text for you to paste into GitHub (I can't push to your repo without access, but I can generate the exact file contents and the git commands to apply it).
-
-Tell me which of the two you want and I’ll generate the file content (or the backend README) right away — no waiting.
-
-[1]: https://github.com/SundramKumar620/saifu "GitHub - SundramKumar620/saifu: solana hd wallet"
-[2]: https://github.com/SundramKumar620/saifu-backend "GitHub - SundramKumar620/saifu-backend: solana hd wallet-backend"
+* Add hardware wallet support (e.g., Ledger)
+* Add Websocket
