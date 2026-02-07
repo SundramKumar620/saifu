@@ -117,6 +117,12 @@ npm run start
 
 ---
 
+Disclaimer
+
+This project is under active development.
+Use at your own risk.
+Do not store large amounts until fully audited.
+
 ## Known limitations & TODOs
 
 * Improve UI for multiple accounts and account derivation paths.
