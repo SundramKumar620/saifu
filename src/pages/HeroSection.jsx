@@ -100,7 +100,7 @@ export default function HeroSection({ onGetStarted }) {
                                 document.body.removeChild(link);
 
                                 // Open video tutorial
-                                window.open('https://www.youtube.com/watch?v=dQw4w9WgXcQ', '_blank'); // TODO: Replace with actual video URL
+                                window.open('https://youtu.be/cSTSvZpKoRw', '_blank'); // TODO: Replace with actual video URL
                             }}
                         >
                             Use as Extension
