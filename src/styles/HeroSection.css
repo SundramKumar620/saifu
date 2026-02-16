@@ -259,6 +259,7 @@
   transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
   will-change: transform, box-shadow, opacity;
   opacity: 1;
+  min-width: 173px;
 }
 
 .btn-hero-primary:hover {
@@ -508,6 +509,7 @@
   background: rgba(0, 0, 0, 0.35);
   backdrop-filter: blur(30px);
   -webkit-backdrop-filter: blur(30px);
+  min-width: 173px;
 }
 
 .btn-hero-secondary:hover {
