@@ -6,9 +6,8 @@ import { loadEncryptedMnemonic, saveToVault, loadFromVault } from '../db/walletD
 import { decryptMnemonic } from '../crypto/crypto';
 import { deriveAccountLocally, derivePrivateKey } from '../crypto/deriveAccount';
 import { getMaxAccountIndex, accountExists } from '../utils/accountUtils';
-import { getSolBalance } from '../utils/solanaBalance';
+import { getWalletData } from '../utils/solanaBalance';
 import { getSolPriceUsd } from '../utils/solPrice';
-import { getTokenBalances } from '../utils/tokenBalance';
 import PasswordModal from '../components/PasswordModal';
 import ManageAccountModal from '../components/ManageAccountModal';
 import AdvancedCreateModal from '../components/AdvancedCreateModal';
@@ -80,19 +79,30 @@ export default function WalletInterface({ onBackupWallet }) {
   // Show ALL accounts in manage account section, not just non-selected ones
   const allAccounts = accounts;
 
-  // Fetch SOL balance when main account changes
+  // Fetch wallet data (SOL balance + tokens) when main account changes
   useEffect(() => {
     if (!mainAccount?.address) {
       setBalance(null);
+      setTokens([]);
+      setTokensLoading(false);
       return;
     }
     let cancelled = false;
-    getSolBalance(mainAccount.address)
-      .then((sol) => {
-        if (!cancelled) setBalance(sol);
+    setTokensLoading(true);
+    getWalletData(mainAccount.address)
+      .then((data) => {
+        if (!cancelled) {
+          setBalance(data.balance);
+          setTokens(data.tokens);
+          setTokensLoading(false);
+        }
       })
       .catch(() => {
-        if (!cancelled) setBalance(null);
+        if (!cancelled) {
+          setBalance(null);
+          setTokens([]);
+          setTokensLoading(false);
+        }
       });
     return () => { cancelled = true; };
   }, [mainAccount?.address]);
@@ -108,26 +118,27 @@ export default function WalletInterface({ onBackupWallet }) {
     return () => { cancelled = true; };
   }, []);
 
-  // Manual refresh - fetches latest balance and price (handles partial success)
+  // Manual refresh - fetches latest wallet data and price
   const handleRefresh = async () => {
     if (isRefreshing) return;
     setIsRefreshing(true);
     try {
-      const [balanceResult, priceResult] = await Promise.allSettled([
-        mainAccount?.address ? getSolBalance(mainAccount.address) : Promise.resolve(null),
+      const [walletResult, priceResult] = await Promise.allSettled([
+        mainAccount?.address ? getWalletData(mainAccount.address) : Promise.resolve(null),
         getSolPriceUsd(),
       ]);
 
-      if (balanceResult.status === "fulfilled" && mainAccount?.address) {
-        setBalance(balanceResult.value);
+      if (walletResult.status === "fulfilled" && walletResult.value) {
+        setBalance(walletResult.value.balance);
+        setTokens(walletResult.value.tokens);
       }
       if (priceResult.status === "fulfilled" && priceResult.value != null) {
         setSolPriceUsd(priceResult.value);
       }
 
-      const balanceOk = balanceResult.status === "fulfilled";
+      const walletOk = walletResult.status === "fulfilled";
       const priceOk = priceResult.status === "fulfilled" && priceResult.value != null;
-      if (balanceOk || priceOk) {
+      if (walletOk || priceOk) {
         toast.success("Balance updated");
       } else {
         toast.error("Failed to refresh");
@@ -277,9 +288,11 @@ export default function WalletInterface({ onBackupWallet }) {
       setPendingSend(null);
       toast.success(`Sent ${pendingSend.amount} SOL successfully!`);
 
-      // Refresh balance after sending
+      // Refresh wallet data after sending
       if (mainAccount?.address) {
-        getSolBalance(mainAccount.address).then(setBalance).catch(() => { });
+        getWalletData(mainAccount.address)
+          .then((data) => { setBalance(data.balance); setTokens(data.tokens); })
+          .catch(() => { });
       }
     } catch (error) {
       toast.error(error.message || 'Failed to send SOL');
@@ -387,30 +400,7 @@ export default function WalletInterface({ onBackupWallet }) {
     return account.name || `Account ${account.index}`;
   };
 
-  // Fetch SPL tokens when main account changes
-  useEffect(() => {
-    if (!mainAccount?.address) {
-      setTokens([]);
-      setTokensLoading(false);
-      return;
-    }
-    let cancelled = false;
-    setTokensLoading(true);
-    getTokenBalances(mainAccount.address)
-      .then((tokenData) => {
-        if (!cancelled) {
-          setTokens(tokenData);
-          setTokensLoading(false);
-        }
-      })
-      .catch(() => {
-        if (!cancelled) {
-          setTokens([]);
-          setTokensLoading(false);
-        }
-      });
-    return () => { cancelled = true; };
-  }, [mainAccount?.address]);
+
 
   return (
     <div className="wallet-interface" style={{ backgroundImage: `url(${bg})` }}>
