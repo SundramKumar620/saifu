@@ -41,30 +41,23 @@ class SaifuWalletProvider extends EventTarget {
         if (event.source !== window) return;
         if (event.data.target !== 'saifu-content') return;
 
-        console.log('[Saifu] Received message:', event.data);
 
         const { id, error, result } = event.data.data || {};
         const pending = this._pendingRequests.get(id);
 
         if (pending) {
-            console.log('[Saifu] Found pending request for ID:', id);
             this._pendingRequests.delete(id);
             if (error) {
-                console.error('[Saifu] Error in response:', error);
                 pending.reject(new Error(error));
             } else {
-                console.log('[Saifu] Resolving with result:', result);
                 pending.resolve(result);
             }
-        } else {
-            console.warn('[Saifu] No pending request found for ID:', id);
         }
     }
 
     _sendRequest(method, params) {
         return new Promise((resolve, reject) => {
             const id = ++this._requestId;
-            console.log('[Saifu] Sending request:', { id, method, params });
             this._pendingRequests.set(id, { resolve, reject });
 
             window.postMessage({
@@ -82,7 +75,6 @@ class SaifuWalletProvider extends EventTarget {
             setTimeout(() => {
                 if (this._pendingRequests.has(id)) {
                     this._pendingRequests.delete(id);
-                    console.error('[Saifu] Request timeout for ID:', id);
                     reject(new Error('Request timeout'));
                 }
             }, 300000);
@@ -132,35 +124,28 @@ class SaifuWalletProvider extends EventTarget {
 
     async connect(options = {}) {
         try {
-            console.log('[Saifu] Connect called with options:', options);
             const response = await this._sendRequest(MessageTypes.CONNECT, {
                 onlyIfTrusted: options.onlyIfTrusted || false,
             });
 
-            console.log('[Saifu] Connect response received:', response);
 
             // Handle error response
             if (response.error) {
-                console.error('[Saifu] Connect error:', response.error);
                 throw new Error(response.error);
             }
 
             // Unwrap result object
             const result = response.result || response;
-            console.log('[Saifu] Connect result after unwrap:', result);
 
             if (result.publicKey) {
                 this.publicKey = new PublicKeyProxy(result.publicKey);
                 this.isConnected = true;
-                console.log('[Saifu] Connection successful! PublicKey:', this.publicKey.toString());
                 this._emitEvent('connect', { publicKey: this.publicKey });
                 return { publicKey: this.publicKey };
             }
 
-            console.error('[Saifu] No publicKey in result:', result);
             throw new Error('Connection rejected');
         } catch (error) {
-            console.error('[Saifu] Connect failed:', error);
             throw error;
         }
     }
@@ -172,7 +157,7 @@ class SaifuWalletProvider extends EventTarget {
             this.isConnected = false;
             this._emitEvent('disconnect');
         } catch (error) {
-            console.error('Disconnect error:', error);
+            // silently ignore disconnect errors
         }
     }
 
@@ -189,7 +174,12 @@ class SaifuWalletProvider extends EventTarget {
         });
 
         if (response.signedTransaction) {
-            return deserializeTransaction(response.signedTransaction);
+            const signedBytes = new Uint8Array(response.signedTransaction);
+            // Reconstruct using the dApp's Transaction class
+            if (transaction.constructor?.from) {
+                return transaction.constructor.from(signedBytes);
+            }
+            return signedBytes;
         }
 
         throw new Error('Transaction signing rejected');
@@ -207,7 +197,14 @@ class SaifuWalletProvider extends EventTarget {
         });
 
         if (response.signedTransactions) {
-            return response.signedTransactions.map(tx => deserializeTransaction(tx));
+            return response.signedTransactions.map((tx, i) => {
+                const signedBytes = new Uint8Array(tx);
+                // Reconstruct using the dApp's Transaction class
+                if (transactions[i]?.constructor?.from) {
+                    return transactions[i].constructor.from(signedBytes);
+                }
+                return signedBytes;
+            });
         }
 
         throw new Error('Transaction signing rejected');
@@ -305,7 +302,7 @@ if (typeof window !== 'undefined') {
             configurable: true,
         });
     } else {
-        console.warn('🔐 Saifu: window.solana already defined by another wallet');
+        // window.solana already defined by another wallet
     }
 
     // Always expose as window.saifu
@@ -318,5 +315,5 @@ if (typeof window !== 'undefined') {
     // Announce wallet for Wallet Standard discovery
     window.dispatchEvent(new Event('wallet-standard:register'));
 
-    console.log('🔐 Saifu Wallet provider injected');
+
 }

@@ -19,9 +19,8 @@ async function initialize() {
             connectedSites = new Map(Object.entries(stored.connectedSites));
         }
         isInitialized = true;
-        console.log('🔐 Saifu background initialized');
     } catch (error) {
-        console.error('Failed to initialize:', error);
+
         // Retry after delay
         setTimeout(initialize, 1000);
     }
@@ -234,7 +233,7 @@ async function handleSignMessage(origin, params) {
 async function handleApprovalResponse(approvalId, approved, data) {
     const pending = pendingApprovals.get(approvalId);
     if (!pending) {
-        console.warn('No pending approval found:', approvalId);
+
         return;
     }
 
@@ -304,4 +303,4 @@ chrome.action.onClicked.addListener((tab) => {
     // Default popup handles this
 });
 
-console.log('🔐 Saifu background service worker started');
+

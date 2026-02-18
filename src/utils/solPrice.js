@@ -11,7 +11,6 @@ export async function getSolPriceUsd() {
 
     return data.price;
   } catch (error) {
-    console.error("Error fetching SOL price:", error);
     return null;
   }
 }

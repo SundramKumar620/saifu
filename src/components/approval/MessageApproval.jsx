@@ -71,7 +71,6 @@ export default function MessageApproval({
 
             await onApprove({ signature: signatureBase64 });
         } catch (err) {
-            console.error('Signing error:', err);
             if (err.message?.includes('decrypt') || err.message?.includes('password')) {
                 setError('Wrong password');
             } else {

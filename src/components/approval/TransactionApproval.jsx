@@ -59,19 +59,18 @@ export default function TransactionApproval({
                 for (const txData of transactions) {
                     const txBytes = new Uint8Array(txData);
                     const tx = Transaction.from(txBytes);
-                    tx.sign(keypair);
+                    tx.partialSign(keypair);
                     signedTxs.push(Array.from(tx.serialize()));
                 }
                 await onApprove({ signedTransactions: signedTxs });
             } else if (transaction) {
                 const txBytes = new Uint8Array(transaction);
                 const tx = Transaction.from(txBytes);
-                tx.sign(keypair);
+                tx.partialSign(keypair);
                 const signedTx = Array.from(tx.serialize());
                 await onApprove({ signedTransaction: signedTx });
             }
         } catch (err) {
-            console.error('Signing error:', err);
             if (err.message?.includes('decrypt') || err.message?.includes('password')) {
                 setError('Wrong password');
             } else {

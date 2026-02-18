@@ -5,7 +5,6 @@ const isExtension = typeof chrome !== 'undefined' && chrome.storage;
 
 export async function saveToStorage(key, value) {
     if (!isExtension) {
-        console.warn('chrome.storage not available');
         return;
     }
     return new Promise((resolve, reject) => {
@@ -21,7 +20,6 @@ export async function saveToStorage(key, value) {
 
 export async function loadFromStorage(key) {
     if (!isExtension) {
-        console.warn('chrome.storage not available');
         return null;
     }
     return new Promise((resolve, reject) => {
@@ -37,7 +35,6 @@ export async function loadFromStorage(key) {
 
 export async function clearStorage() {
     if (!isExtension) {
-        console.warn('chrome.storage not available');
         return;
     }
     return new Promise((resolve, reject) => {

@@ -37,7 +37,6 @@ export default function UnlockScreen({ onUnlock, onCancel }) {
 
             onUnlock();
         } catch (err) {
-            console.error('Unlock error:', err);
             if (err.message?.includes('decrypt') || err.message?.includes('password') || err.message?.includes('MAC')) {
                 setError('Incorrect password');
             } else {

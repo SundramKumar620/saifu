@@ -33,7 +33,6 @@ export default function ApprovalApp() {
                 setIsLocked(!walletUnlocked);
                 setCheckingLock(false);
             } catch (err) {
-                console.error('Error checking wallet lock:', err);
                 setIsLocked(true);
                 setCheckingLock(false);
             }

@@ -11,7 +11,7 @@ function injectScript() {
         container.insertBefore(scriptTag, container.children[0]);
         container.removeChild(scriptTag);
     } catch (error) {
-        console.error('Saifu: Provider injection failed', error);
+        // Provider injection failed
     }
 }
 
@@ -29,7 +29,6 @@ window.addEventListener('message', (event) => {
 
     // Check if we're in a valid extension context
     if (!chrome?.runtime?.id) {
-        console.error('Saifu: Extension context not available');
         window.postMessage({
             target: 'saifu-content',
             type: type,
@@ -49,7 +48,6 @@ window.addEventListener('message', (event) => {
     }, (response) => {
         // Check for errors
         if (chrome.runtime.lastError) {
-            console.error('Saifu: Runtime error:', chrome.runtime.lastError);
             window.postMessage({
                 target: 'saifu-content',
                 type: type,
@@ -72,7 +70,7 @@ window.addEventListener('message', (event) => {
                 }
             }, '*');
         } catch (error) {
-            console.error('Saifu: Failed to post message:', error);
+            // Failed to post message
         }
     });
 });
@@ -87,7 +85,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
                 ...message
             }, '*');
         } catch (error) {
-            console.error('Saifu: Failed to post message:', error);
+            // Failed to post message
         }
     }
 });

@@ -11,7 +11,6 @@ export default function ConnectApproval({ origin, address, onApprove, onReject }
             // Pass the publicKey back to the background script
             await onApprove({ publicKey: address });
         } catch (error) {
-            console.error('Approval error:', error);
             setIsConnecting(false);
         }
     };

@@ -11,7 +11,6 @@ export async function getSolBalance(address) {
 
     return data.balance;
   } catch (error) {
-    console.error("Error fetching SOL balance:", error);
     throw error;
   }
 }

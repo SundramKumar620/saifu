@@ -12,7 +12,6 @@ export async function getTokenBalances(address) {
         // Backend already formats the data correctly
         return data.tokens || [];
     } catch (error) {
-        console.error("Error fetching token balances:", error);
         return [];
     }
 }

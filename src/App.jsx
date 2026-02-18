@@ -89,7 +89,6 @@ export default function App() {
       setShowLoadingModal(false);
       setShowSeedPhraseModal(true);
     } catch (error) {
-      console.error("Error creating wallet:", error);
       setShowLoadingModal(false);
       toast.error("Failed to create wallet. Please try again.");
     }
@@ -146,7 +145,6 @@ export default function App() {
       setShowLoadingModal(false);
       toast.success("Wallet imported successfully!");
     } catch (error) {
-      console.error("Error importing wallet:", error);
       setShowLoadingModal(false);
       toast.error("Failed to import wallet. Please check your recovery phrase and try again.");
     }
